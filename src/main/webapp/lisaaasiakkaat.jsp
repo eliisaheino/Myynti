@@ -24,7 +24,7 @@
 					<th>Etunimi</th>
 					<th>Sukunimi</th>
 					<th>Puhelin</th>
-					<th>S‰hkˆposti</th>
+					<th>Sposti</th>
 					<th></th>
 				</tr>
 			</thead>
@@ -33,14 +33,14 @@
 					<td><input type="text" name="etunimi" id="etunimi"></td>
 					<td><input type="text" name="sukunimi" id="sukunimi"></td>
 					<td><input type="text" name="puhelin" id="puhelin"></td>
-					<td><input type="email" name="sposti" id="sposti"></td>
+					<td><input type="text" name="sposti" id="sposti"></td>
 					<td><input type="submit" id="tallenna" value="Lis‰‰"></td>
 				</tr>
 			</tbody>
 		</table>
 	</form>
 	<span id="ilmo"></span>
-</body>
+
 <script>
 
 $ (document).ready(function() {
@@ -49,16 +49,16 @@ $ (document).ready(function() {
 	document.location="listaaasiakkaat.jsp";	
 });
 	
-//Kohdistuu lomakkeen <form> id:tiedot-kohtaan
+//Kohdistuu lomakkeen <form> id:tiedot-kohtaan.Lomakkeen tietojen tarkistus
 $("#tiedot").validate({						
 	rules: {
 		etunimi:  {
 			required: true,
-			minlength: 1				
+			minlength: 2				
 		},	
 		sukunimi:  {
 			required: true,
-			minlength: 1				
+			minlength: 2				
 		},
 		puhelin:  {
 			required: true,
@@ -100,22 +100,30 @@ $("#tiedot").validate({
 	submitHandler: function(form) {	
 		lisaaTiedot();
 	}		
-}); 	
+}); //validointi loppuu t‰h‰n
+
+//Vied‰‰n kursori etunimi kentt‰‰n sivun latauksen yhteydess‰
+$("#etunimi").focus();
+
 });
+
 //funktio tietojen lis‰‰mist‰ varten. Kutsutaan backin POST-metodia ja v‰litet‰‰n kutsun mukana uudet tiedot json-stringin‰.
 //POST /asiakkaat/
-function lisaaTiedot(){	
+function lisaaTiedot() {	
 	var formJsonStr = formDataJsonStr($("#tiedot").serializeArray()); //muutetaan lomakkeen tiedot json-stringiksi
+	console.log(formJsonStr);
 	//Kutsutaan Asiakkaat-backendia
-	$.ajax({url:"asiakkaat", data:formJsonStr, type:"POST", dataType:"json", success:function(result) { //result on joko {"response:1"} tai {"response:0"}       
+	$.ajax({url:"Asiakkaat", data:formJsonStr, type:"POST", dataType:"json", success:function(result) { //result on joko {"response:1"} tai {"response:0"}       
 		if(result.response==0){
   	$("#ilmo").html("Asiakkaan lis‰‰minen ep‰onnistui.");
   }else if(result.response==1){			
   	$("#ilmo").html("Asiakkaan lis‰‰minen onnistui.");
   	$("#etunimi", "#sukunimi", "#puhelin", "#sposti").val("");
 		}
-}});	
+}});
+	
 }
 
 </script>
+</body>
 </html>

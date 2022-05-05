@@ -1,6 +1,7 @@
 package model;
 
 public class AsiakasMalli {
+	private int asiakas_id;
 	private String etunimi, sukunimi, puhelin, sposti;
 
 	//Konstruktorit
@@ -8,8 +9,9 @@ public class AsiakasMalli {
 		super();	
 	}
 
-	public AsiakasMalli(String etunimi, String sukunimi, String puhelin, String sposti) {
+	public AsiakasMalli(int asiakas_id, String etunimi, String sukunimi, String puhelin, String sposti) {
 		super();
+		this.asiakas_id = asiakas_id;
 		this.etunimi = etunimi;
 		this.sukunimi = sukunimi;
 		this.puhelin = puhelin;
@@ -17,8 +19,18 @@ public class AsiakasMalli {
 	}
 
 	//Getterit ja setterit
+	
+
 	public String getEtunimi() {
 		return etunimi;
+	}
+
+	public int getAsiakas_id() {
+		return asiakas_id;
+	}
+
+	public void setAsiakas_id(int asiakas_id) {
+		this.asiakas_id = asiakas_id;
 	}
 
 	public void setEtunimi(String etunimi) {
@@ -49,12 +61,14 @@ public class AsiakasMalli {
 		this.sposti = sposti;
 	}
 
-	//toString
 	@Override
 	public String toString() {
-		return "AsiakasMalli [etunimi=" + etunimi + ", sukunimi=" + sukunimi + ", puhelin=" + puhelin + ", sposti="
-				+ sposti + "]";
+		return "AsiakasMalli [asiakas_id=" + asiakas_id + ", etunimi=" + etunimi + ", sukunimi=" + sukunimi
+				+ ", puhelin=" + puhelin + ", sposti=" + sposti + "]";
 	}
+
+	
+	
 	
 	
 	

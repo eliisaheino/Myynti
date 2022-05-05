@@ -7,11 +7,6 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 <link rel="stylesheet" type="text/css" href="css/main.css">
 <title>Listaa asiakkaat</title>
-<style>
-.oikealle {
-	text-align: right;
-}
-</style>
 </head>
 <body>
 	<table id="listaus">
@@ -21,15 +16,15 @@
 		      </tr>
 			<tr>
 				<th class="oikealle">Hakusana:</th>
-				<th colspan="2"><input type="text" id="hakusana"></th>
+				<th colspan="3"><input type="text" id="hakusana"></th>
 				<th><input type="button" value="hae" id="hakunappi"></th>
 			</tr>
 			<tr>
 				<th>Etunimi</th>
 				<th>Sukunimi</th>
 				<th>Puhelin</th>
-				<th>Sähköposti</th>
-				<th></th>
+				<th>Sposti</th>
+				<th>&nbsp;</th>	
 			</tr>
 		</thead>
 		<tbody>
@@ -43,19 +38,21 @@ $ (document).ready(function() {
 		document.location="lisaaasiakkaat.jsp";
 	});
 	
-	//Tehdään hakunapille click-funktio tähän
-	haeAsiakkaat();
+	
 	$("#hakunappi").click(function() {
 		haeAsiakkaat();
 	});
+	
 	//Funktio näppäimistön painallukselle hakukentässä
 	$(document.body).on("keydown", function (event){
 		if(event.which == 13){ //13= Enteriä painettu, ajetaan haku
 			haeAsiakkaat();
 		}
 	});
+	
 	//Viedään kursori hakusana-kenttään sivun latauksen yhteydessä
 	$("#hakusana").focus();
+	haeAsiakkaat();
 
 });
 
@@ -63,39 +60,40 @@ $ (document).ready(function() {
 function haeAsiakkaat() {
 	$("#listaus tbody").empty(); //Listauksen tyhjennys ennen seuraavaa hakua	
 	$.getJSON({
-		url : "asiakkaat/"+$("#hakusana").val(), //Kutsuu get-metodia mutta laittaa mukaan myös hakusanan
+		url : "Asiakkaat/"+$("#hakusana").val(), //Kutsuu get-metodia mutta laittaa mukaan myös hakusanan
 		type : "GET",
 		dataType : "json",
 		success : function(result) {//Funktio palauttaa backend listan asiakkaista(asiakkaat.java)tiedot json-objektina result-kohtaan		
 			$.each(result.asiakkaat, function(i, field) {
 				var htmlStr;
-				htmlStr += "<tr>";
+				htmlStr += "<tr id='rivi_"+ field.asiakas_id+"'>";
 				htmlStr += "<td>" + field.etunimi + "</td>"; //sarakkeiden sulkeminen
 				htmlStr += "<td>" + field.sukunimi + "</td>";
 				htmlStr += "<td>" + field.puhelin + "</td>";
 				htmlStr += "<td>" + field.sposti + "</td>";
-				htmlStr += "<td><span class= 'poista'onclick = poista ('"+field.etunimi+sukunimi+"')>Poista</span></td>";
-				htmlStr += "</tr>";//rivin sulkeminen
+				htmlStr += "<td><a href= 'muutaasiakas.jsp?asiakas_id="+field.asiakas_id+"'>Muuta</a>&nbsp;";
+				htmlStr += "<td><span class= 'poista' onclick=poista("+field.asiakas_id+",'"+field.etunimi+"','"+field.sukunimi+"')>Poista</span></td>";
+				htmlStr += "</tr>";
 				$("#listaus tbody").append(htmlStr);
 			});
 
 		}});
 }
 //Asiakkaan poistaminen
-function poista(asiakas_id){
-	if(confirm("Poista asiakas " + asiakas_id + "?")){
+function poista(asiakas_id, etunimi, sukunimi){
+	if(confirm("Poista asiakas " + etunimi +" "+ sukunimi +"?")){
 		$.ajax({url:"asiakkaat/"+asiakas_id, type:"DELETE",dataType:"json", success:function(result) { //result on joko {"response:1"} tai {"response:0"}
 	        if(result.response==0){
 	        	$("#ilmo").html("Asiakkaan poisto epäonnistui.");
 	        }else if(result.response==1){
 	        	$("#rivi_"+asiakas_id).css("background-color", "red"); //Värjätään poistettu rivi
-	        	alert("Asiakkaan " + asiakas_id + " poisto onnistui.");
+	        	alert("Asiakkaan " + etunimi +" "+ sukunimi+ " poisto onnistui.");
 				haeAsiakkaat();  //Poistamisen jälkeen haetaan jäljelle jääneet asiakkaat    	
 			}
 	    }});
 	}
-}
 
+}
 </script>
 </body>
 </html>

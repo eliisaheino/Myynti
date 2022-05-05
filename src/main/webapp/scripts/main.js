@@ -9,9 +9,9 @@ function requestURLParam(sParam){
 	}
 }
 
-function formDataJSONStr(formArray){
+function formDataJSONStr(formArray) {
 	var returnArray = {};
-	for(var i = 0; i < formArray.length; i++){
+	for (var i = 0; i < formArray.length; i++) {
 		returnArray[formArray[i]['name']] = formArray[i]['value'];
 	}
 	return JSON.stringify(returnArray);

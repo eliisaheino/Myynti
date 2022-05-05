@@ -10,6 +10,7 @@ import model.AsiakasMalli;
 
 
 
+
 public class Dao {
 	private Connection con=null;
 	private ResultSet rs = null;
@@ -66,7 +67,7 @@ public class Dao {
 	
 	public ArrayList<AsiakasMalli> listaaKaikki(String hakusana){
 		ArrayList<AsiakasMalli> asiakkaat = new ArrayList<AsiakasMalli>();
-		sql = "SELECT * FROM asiakkaat WHERE etunimi LIKE ? or sukunimi LIKE ? or puhelin LIKE ? or sposti LIKE ?";       
+		sql = "SELECT * FROM asiakkaat WHERE etunimi LIKE ? or sukunimi LIKE ? or sposti LIKE ? or puhelin LIKE ?";       
 		try {
 			con=yhdista();
 			if(con!=null){ //jos yhteys onnistui
@@ -82,10 +83,11 @@ public class Dao {
 					//Laitetaan luotu Asiakas add-metodilla arraylistiin
 					while(rs.next()){
 						AsiakasMalli asiakas = new AsiakasMalli();
-						asiakas.setEtunimi(rs.getString(1)); //Hae taulun ensimm‰isest‰ sarakkeesta arvo ja aseta se reknro paikalle
-						asiakas.setSukunimi(rs.getString(2)); //Hae taulun toisesta sarakkeesta arvo ja aseta se merkin paikalle
-						asiakas.setPuhelin(rs.getString(3));	 //Hae taulun kolmannesta sarakkeesta arvo ja aseta se mallin paikalle
-						asiakas.setSposti(rs.getString(4));	//Hae taulun nelj‰nnest‰ sarakkeesta arvo ja aseta se vuoden paikalle
+						asiakas.setAsiakas_id(rs.getInt(1));
+						asiakas.setEtunimi(rs.getString(2)); //Hae taulun ensimm‰isest‰ sarakkeesta arvo ja aseta se reknro paikalle
+						asiakas.setSukunimi(rs.getString(3)); //Hae taulun toisesta sarakkeesta arvo ja aseta se merkin paikalle
+						asiakas.setPuhelin(rs.getString(4));	 //Hae taulun kolmannesta sarakkeesta arvo ja aseta se mallin paikalle
+						asiakas.setSposti(rs.getString(5));	//Hae taulun nelj‰nnest‰ sarakkeesta arvo ja aseta se vuoden paikalle
 						asiakkaat.add(asiakas);
 						
 					}					
@@ -101,7 +103,7 @@ public class Dao {
 	//Metodi uuden asiakkaan lis‰‰mist‰ varten
 	public boolean lisaaAsiakas(AsiakasMalli asiakas){
 		boolean paluuArvo=true;
-		sql="INSERT INTO asiakkaat VALUES(?,?,?,?)";						  
+		sql="INSERT INTO asiakkaat (etunimi,sukunimi,puhelin,sposti) VALUES (?,?,?,?)";						  
 		try {
 			con = yhdista();
 			stmtPrep=con.prepareStatement(sql); 
@@ -110,6 +112,7 @@ public class Dao {
 			stmtPrep.setString(3, asiakas.getPuhelin());
 			stmtPrep.setString(4, asiakas.getSposti());
 			stmtPrep.executeUpdate();
+			//System.out.println("Uusin id on:" + stmtPrep.getGeneratedKeys().getInt(1);
 	        con.close();
 		} catch (Exception e) {				
 			e.printStackTrace();
@@ -119,13 +122,13 @@ public class Dao {
 	}
 	
 	//Metodi asiakkaan poistamiseen
-	public boolean poistaAsiakas(String asiakas_id){
+	public boolean poistaAsiakas(int asiakas_id){
 		boolean paluuArvo=true;
 		sql="DELETE FROM asiakkaat WHERE asiakas_id=?";						  
 		try {
 			con = yhdista();
 			stmtPrep=con.prepareStatement(sql); 
-			stmtPrep.setString(1, asiakas_id);	
+			stmtPrep.setInt(1, asiakas_id);	
 			stmtPrep.executeUpdate();
 	        con.close();
 		} catch (Exception e) {				
@@ -134,5 +137,49 @@ public class Dao {
 		}				
 		return paluuArvo;
 	}
-
+	//Metodi asiakkaan etsimiseen
+	public AsiakasMalli etsiAsiakas(int asiakas_id) {
+		AsiakasMalli asiakas = null;
+		sql = "SELECT * FROM asiakkaat WHERE asiakas_id=?";       
+		try {
+			con=yhdista();
+			if(con!=null){ 
+				stmtPrep = con.prepareStatement(sql); 
+				stmtPrep.setInt(1, asiakas_id);
+        		rs = stmtPrep.executeQuery();  
+        		if(rs.isBeforeFirst()){ 
+        			rs.next();
+        			asiakas = new AsiakasMalli();        			
+        			asiakas.setEtunimi(rs.getString(1));
+					asiakas.setSukunimi(rs.getString(2));
+					asiakas.setPuhelin(rs.getString(2));
+					asiakas.setSposti(rs.getString(2));
+				}        		
+			}	
+			con.close();  
+		} catch (Exception e) {
+			e.printStackTrace();
+		}		
+		return asiakas;		
+	}
+	
+	public boolean muutaAsiakas(AsiakasMalli asiakas, int asiakas_id){
+		boolean paluuArvo=true;
+		sql="UPDATE asiakkaat SET etunimi=?, sukunimi=?, puhelin=?, sposti=? WHERE asiakas_id=?";						  
+		try {
+			con = yhdista();
+			stmtPrep=con.prepareStatement(sql); 
+			stmtPrep.setString(1, asiakas.getEtunimi());
+			stmtPrep.setString(2, asiakas.getSukunimi());
+			stmtPrep.setString(3, asiakas.getPuhelin());
+			stmtPrep.setString(4, asiakas.getSposti());
+			stmtPrep.setInt(5, asiakas_id);
+			stmtPrep.executeUpdate();
+	        con.close();
+		} catch (Exception e) {				
+			e.printStackTrace();
+			paluuArvo=false;
+		}				
+		return paluuArvo;
+	}
 }
